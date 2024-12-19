@@ -1,0 +1,15 @@
+services:
+  nginx-proxy:
+    image: "jwilder/nginx-proxy:latest"
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - shared-network
+    volumes:
+      - '/etc/ssl:/etc/nginx/certs'
+      - './proxy.conf:/etc/nginx/proxy.conf'
+      - '/var/run/docker.sock:/tmp/docker.sock:ro'
+networks:
+  shared-network:
+    external: true
