@@ -1,15 +1,39 @@
 services:
   nginx-proxy:
-    image: "jwilder/nginx-proxy:latest"
+    image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy
     ports:
       - "80:80"
       - "443:443"
     networks:
       - shared-network
     volumes:
-      - '/etc/ssl:/etc/nginx/certs'
       - './proxy.conf:/etc/nginx/proxy.conf'
       - '/var/run/docker.sock:/tmp/docker.sock:ro'
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs:ro
+    network_mode: bridge
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    environment:
+      - DEFAULT_EMAIL=support@profstep.com
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    network_mode: bridge
+
+volumes:
+  # vhost:
+  # conf:
+  html:
+  certs:
+  acme:
+
 networks:
   shared-network:
     external: true
